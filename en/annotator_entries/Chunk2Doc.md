@@ -21,9 +21,7 @@ DOCUMENT
 {%- capture python_example -%}
 import sparknlp
 from sparknlp.base import *
-from sparknlp.common import *
 from sparknlp.annotator import *
-from sparknlp.training import *
 from pyspark.ml import Pipeline
 from sparknlp.pretrained import PretrainedPipeline
 # Location entities are extracted and converted back into `DOCUMENT` type for further processing
@@ -76,6 +74,10 @@ result.selectExpr("explode(chunkConverted)").show(false)
 [Chunk2Doc](https://nlp.johnsnowlabs.com/api/com/johnsnowlabs/nlp/Chunk2Doc)
 {%- endcapture -%}
 
+{%- capture python_api_link -%}
+[Chunk2Doc](https://nlp.johnsnowlabs.com/api/python/reference/autosummary/sparknlp.base.Chunk2Doc.html)
+{%- endcapture -%}
+
 {%- capture source_link -%}
 [Chunk2Doc](https://github.com/JohnSnowLabs/spark-nlp/tree/master/src/main/scala/com/johnsnowlabs/nlp/Chunk2Doc.scala)
 {%- endcapture -%}
@@ -87,6 +89,7 @@ input_anno=input_anno
 output_anno=output_anno
 python_example=python_example
 scala_example=scala_example
+python_api_link=python_api_link
 api_link=api_link
 source_link=source_link
 %}

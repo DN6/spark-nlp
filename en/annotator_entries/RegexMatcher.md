@@ -19,6 +19,10 @@ CHUNK
 [RegexMatcherModel](https://nlp.johnsnowlabs.com/api/com/johnsnowlabs/nlp/annotators/RegexMatcherModel)
 {%- endcapture -%}
 
+{%- capture model_python_api_link -%}
+[RegexMatcherModel](https://nlp.johnsnowlabs.com/api/python/reference/autosummary/sparknlp.annotator.RegexMatcherModel.html)
+{%- endcapture -%}
+
 {%- capture model_source_link -%}
 [RegexMatcherModel](https://github.com/JohnSnowLabs/spark-nlp/tree/master/src/main/scala/com/johnsnowlabs/nlp/annotators/RegexMatcherModel.scala)
 {%- endcapture -%}
@@ -26,7 +30,7 @@ CHUNK
 {%- capture approach_description -%}
 Uses a reference file to match a set of regular expressions and associate them with a provided identifier.
 
-A dictionary of predefined regular expressions must be provided with `setRules`.
+A dictionary of predefined regular expressions must be provided with `setExternalRules`.
 The dictionary can be set as a delimited text file.
 
 Pretrained pipelines are available for this module, see [Pipelines](https://nlp.johnsnowlabs.com/docs/en/pipelines).
@@ -46,9 +50,7 @@ CHUNK
 {%- capture approach_python_example -%}
 import sparknlp
 from sparknlp.base import *
-from sparknlp.common import *
 from sparknlp.annotator import *
-from sparknlp.training import *
 from pyspark.ml import Pipeline
 # In this example, the `rules.txt` has the form of
 #
@@ -102,7 +104,7 @@ val documentAssembler = new DocumentAssembler().setInputCol("text").setOutputCol
 val sentence = new SentenceDetector().setInputCols("document").setOutputCol("sentence")
 
 val regexMatcher = new RegexMatcher()
-  .setRules("src/test/resources/regex-matcher/rules.txt",  ",")
+  .setExternalRules("src/test/resources/regex-matcher/rules.txt",  ",")
   .setInputCols(Array("sentence"))
   .setOutputCol("regex")
   .setStrategy("MATCH_ALL")
@@ -128,6 +130,10 @@ results.selectExpr("explode(regex) as result").show(false)
 [RegexMatcher](https://nlp.johnsnowlabs.com/api/com/johnsnowlabs/nlp/annotators/RegexMatcher)
 {%- endcapture -%}
 
+{%- capture approach_python_api_link -%}
+[RegexMatcher](https://nlp.johnsnowlabs.com/api/python/reference/autosummary/sparknlp.annotator.RegexMatcher.html)
+{%- endcapture -%}
+
 {%- capture approach_source_link -%}
 [RegexMatcher](https://github.com/JohnSnowLabs/spark-nlp/tree/master/src/main/scala/com/johnsnowlabs/nlp/annotators/RegexMatcher.scala)
 {%- endcapture -%}
@@ -138,6 +144,7 @@ title=title
 model_description=model_description
 model_input_anno=model_input_anno
 model_output_anno=model_output_anno
+model_python_api_link=model_python_api_link
 model_api_link=model_api_link
 model_source_link=model_source_link
 approach_description=approach_description
@@ -145,6 +152,7 @@ approach_input_anno=approach_input_anno
 approach_output_anno=approach_output_anno
 approach_python_example=approach_python_example
 approach_scala_example=approach_scala_example
+approach_python_api_link=approach_python_api_link
 approach_api_link=approach_api_link
 approach_source_link=approach_source_link
 %}
