@@ -106,8 +106,8 @@ class CometLogger:
     def log_visualization(self, html, name="viz.html"):
         self.log_asset_data(html, name)
 
-    def log_metrics(self, metrics, step=None, epoch=None):
-        self.experiment.log_metrics(metrics, step=step, epoch=epoch)
+    def log_metrics(self, metrics, step=None, epoch=None, prefix=None):
+        self.experiment.log_metrics(metrics, step=step, epoch=epoch, prefix=prefix)
 
     def log_parameters(self, parameters, step=None):
         self.experiment.log_parameters(parameters, step=step)
