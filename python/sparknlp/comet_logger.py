@@ -111,6 +111,14 @@ class CometLogger:
         self._parse_log_entry(stats)
         self.experiment.log_other("log_file_path", log_file_path)
 
+    def log_asset(self, asset_path, metadata=None, step=None):
+        self.experiment.log_asset(asset_path, metadata=metadata, step=step)
+
+    def log_asset_data(self, asset, name, overwrite=False, metadata=None, step=None):
+        self.experiment.log_asset_data(
+            asset, name, overwrite=overwrite, metadata=metadata, step=step
+        )
+
     def monitor(self, logdir, model, interval=10):
         self.experiment.log_other("model_uid", model.uid)
         self.thread = threading.Thread(
