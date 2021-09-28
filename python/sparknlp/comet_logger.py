@@ -7,6 +7,8 @@ except ModuleNotFoundError:
     # Python 3.7+
     comet_ml = None
 
+from typing import List
+
 import threading
 import time
 import os
