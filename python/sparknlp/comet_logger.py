@@ -111,38 +111,6 @@ class CometLogger:
             stats = f.read().splitlines()
         self._parse_log_entry(stats)
 
-    def __log_watcher(self, filename, interval):
-        # Wait for file to be created:
-        while not os.path.exists(filename):
-            time.sleep(interval)
-
-        # Open file and read lines when ready:
-        fp = open(filename)
-        while True:
-            try:
-                position = fp.tell()
-                data = fp.read()
-
-                if data.endswith("\n"):
-                    lines = data.split("\n")
-                    self._parse_log_entry(lines)
-
-                else:
-                    if "\n" in data:
-                        newline_position = data.rindex("\n")
-                        lines = data[:newline_position].split("\n")
-                        fp.seek(position + newline_position + 3)
-                        self._parse_log_entry(lines)
-                    else:
-                        fp.seek(position)
-
-                time.sleep(10)
-            except Exception as exc:
-                print(exc)
-                break
-
-        fp.close()
-
     def _file_watcher(self, filename, interval):
         """Generator that yields lines from the model log file
 
@@ -156,12 +124,16 @@ class CometLogger:
         """
         fp = open(filename)
 
+        line = ""
         while True:
             try:
-                line = fp.readline()
-                if line is not None:
+                partial_line = fp.readline()
+                if partial_line is not None:
+                    line += partial_line
                     if line.endswith("\n"):
                         yield line
+                        line = ""
+
                 elif interval:
                     time.sleep(interval)
 
