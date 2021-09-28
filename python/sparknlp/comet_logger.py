@@ -83,6 +83,12 @@ class CometLogger:
             )
 
     def log_pipeline_parameters(self, pipeline, stages=None):
+        """Iterate over the different stages in a pyspark PipelineModel object
+
+        Args:
+            pipeline (pyspark.ml.PipelineModel): PipelineModel object
+            stages (List[str], optional): Names of the Pipeline Stages to log. Defaults to None.
+        """
         self.experiment.log_other("pipeline_uid", pipeline.uid)
         if stages is None:
             stages = [s.name for s in pipeline.stages]
@@ -105,6 +111,11 @@ class CometLogger:
         self.experiment.log_parameters(parameters, step=step)
 
     def log_completed_run(self, log_file_path):
+        """Log training metrics after a run has completed
+
+        Args:
+            log_file_path (str): Path to log file containing training metrics
+        """
         with open(log_file_path, "r") as f:
             stats = f.read().splitlines()
 
