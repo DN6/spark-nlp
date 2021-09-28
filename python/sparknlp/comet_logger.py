@@ -193,7 +193,7 @@ class CometLogger:
             parts = line.split("-")
             if line.startswith("Training started"):
                 parameters = self._parse_run_parameters(parts)
-                self.experiment.log_parameters(parameters)
+                self.log_parameters(parameters)
 
             elif line.startswith("Epoch"):
                 metrics, epoch = self._parse_run_metrics(parts)
