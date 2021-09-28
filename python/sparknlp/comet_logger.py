@@ -8,9 +8,9 @@ import os
 class CometLogger:
     def __init__(
         self,
-        workspace,
-        project_name,
-        comet_mode,
+        workspace=None,
+        project_name=None,
+        comet_mode=None,
         experiment_id=None,
         tags=None,
         **experiment_kwargs,
@@ -22,40 +22,53 @@ class CometLogger:
         self.experiment_id = experiment_id
         self.experiment_kwargs = experiment_kwargs
 
-        self.experiment = self._get_experiment(self.comet_mode, self.experiment_id)
+        self.experiment = self._get_experiment(
+            self.comet_mode,
+            self.workspace,
+            self.project_name,
+            self.experiment_id,
+            **self.experiment_kwargs,
+        )
         self.experiment.log_other("Created from", "SparkNLP")
         if tags is not None:
             self.experiment.add_tags(tags)
 
-    def _get_experiment(self, mode, experiment_id=None):
+    def _get_experiment(
+        self,
+        mode,
+        workspace=None,
+        project_name=None,
+        experiment_id=None,
+        **experiment_kwargs,
+    ):
         if mode == "offline":
             if experiment_id is not None:
                 return comet_ml.ExistingOfflineExperiment(
                     previous_experiment=experiment_id,
-                    workspace=self.workspace,
-                    project_name=self.project_name,
-                    **self.experiment_kwargs,
+                    workspace=workspace,
+                    project_name=project_name,
+                    **experiment_kwargs,
                 )
 
             return comet_ml.OfflineExperiment(
-                workspace=self.workspace,
-                project_name=self.project_name,
-                **self.experiment_kwargs,
+                workspace=workspace,
+                project_name=project_name,
+                **experiment_kwargs,
             )
 
         else:
             if experiment_id is not None:
                 return comet_ml.ExistingExperiment(
                     previous_experiment=experiment_id,
-                    workspace=self.workspace,
-                    project_name=self.project_name,
-                    **self.experiment_kwargs,
+                    workspace=workspace,
+                    project_name=project_name,
+                    **experiment_kwargs,
                 )
 
             return comet_ml.Experiment(
-                workspace=self.workspace,
-                project_name=self.project_name,
-                **self.experiment_kwargs,
+                workspace=workspace,
+                project_name=project_name,
+                **experiment_kwargs,
             )
 
     def log_pipeline_parameters(self, pipeline, stages=None):
@@ -72,7 +85,7 @@ class CometLogger:
                 self.experiment.log_parameter(f"{stage.name}-{param.name}", param_value)
 
     def log_visualization(self, html, name="viz.html"):
-        self.experiment.log_asset_data(html, name, asset_type="html")
+        self.experiment.log_asset_data(html, name)
 
     def log_metrics(self, metrics, step=None, epoch=None):
         self.experiment.log_metrics(metrics, step=step, epoch=epoch)
@@ -83,7 +96,7 @@ class CometLogger:
     def monitor(self, logdir, model, interval=10):
         self.experiment.log_other("model_uid", model.uid)
         self.thread = threading.Thread(
-            target=self._log_watcher,
+            target=self._monitor_log_file,
             args=(
                 os.path.join(logdir, f"{model.uid}.log"),
                 interval,
@@ -91,7 +104,7 @@ class CometLogger:
         )
         self.thread.start()
 
-    def log_model_log(self, model):
+    def log_run(self, model):
         log_file_path = f"./{model.uid}.log"
         self.experiment.log_other("model_uid", model.uid)
         with open(log_file_path, "r") as f:
@@ -158,7 +171,7 @@ class CometLogger:
 
         fp.close()
 
-    def _log_watcher(self, filename, interval):
+    def _monitor_log_file(self, filename, interval):
         # Wait for file to be created:
         while not os.path.exists(filename):
             time.sleep(interval)
