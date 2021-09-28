@@ -1,4 +1,11 @@
-import comet_ml
+try:
+    import comet_ml
+except AttributeError:
+    # Python 3.6
+    comet_ml = None
+except ModuleNotFoundError:
+    # Python 3.7+
+    comet_ml = None
 
 import threading
 import time
@@ -15,7 +22,11 @@ class CometLogger:
         tags=None,
         **experiment_kwargs,
     ):
-        self.experiment = comet_ml.Experiment()
+        if comet_ml is None:
+            raise ImportError(
+                "`comet_ml` is not installed. Please install it with `pip install comet-ml`."
+            )
+
         self.comet_mode = comet_mode
         self.workspace = workspace
         self.project_name = project_name
@@ -93,6 +104,13 @@ class CometLogger:
     def log_parameters(self, parameters, step=None):
         self.experiment.log_parameters(parameters, step=step)
 
+    def log_completed_run(self, log_file_path):
+        with open(log_file_path, "r") as f:
+            stats = f.read().splitlines()
+
+        self._parse_log_entry(stats)
+        self.experiment.log_other("log_file_path", log_file_path)
+
     def monitor(self, logdir, model, interval=10):
         self.experiment.log_other("model_uid", model.uid)
         self.thread = threading.Thread(
@@ -103,13 +121,6 @@ class CometLogger:
             ),
         )
         self.thread.start()
-
-    def log_run(self, model):
-        log_file_path = f"./{model.uid}.log"
-        self.experiment.log_other("model_uid", model.uid)
-        with open(log_file_path, "r") as f:
-            stats = f.read().splitlines()
-        self._parse_log_entry(stats)
 
     def _file_watcher(self, filename, interval):
         """Generator that yields lines from the model log file
@@ -138,7 +149,6 @@ class CometLogger:
                     time.sleep(interval)
 
             except Exception as e:
-                print(e)
                 break
 
         fp.close()
