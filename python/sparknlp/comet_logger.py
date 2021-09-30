@@ -222,3 +222,4 @@ class CometLogger:
 
     def end(self):
         self.experiment.end()
+        self.thread.join()
