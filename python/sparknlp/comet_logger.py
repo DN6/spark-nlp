@@ -46,6 +46,9 @@ class CometLogger:
         if tags is not None:
             self.experiment.add_tags(tags)
 
+        self._watch_file = False
+        self._monitor_thread_timeout = 5
+
     def _get_experiment(
         self,
         mode,
@@ -133,6 +136,7 @@ class CometLogger:
         )
 
     def monitor(self, logdir, model, interval=10):
+        self._watch_file = True
         self.experiment.log_other("model_uid", model.uid)
         self.thread = threading.Thread(
             target=self._monitor_log_file,
@@ -157,7 +161,7 @@ class CometLogger:
         fp = open(filename)
 
         line = ""
-        while True:
+        while self._watch_file:
             try:
                 partial_line = fp.readline()
                 if partial_line is not None:
@@ -221,5 +225,6 @@ class CometLogger:
                 self.log_metrics(metrics, step=int(epoch), epoch=int(epoch))
 
     def end(self):
+        self._watch_file = False
         self.experiment.end()
-        self.thread.join()
+        self.thread.join(timeout=self._monitor_thread_timeout)
