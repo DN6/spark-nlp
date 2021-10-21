@@ -162,19 +162,15 @@ class CometLogger:
 
         line = ""
         while self._watch_file:
-            try:
-                partial_line = fp.readline()
-                if partial_line is not None:
-                    line += partial_line
-                    if line.endswith("\n"):
-                        yield line
-                        line = ""
+            partial_line = fp.readline()
+            if partial_line is not None:
+                line += partial_line
+                if line.endswith("\n"):
+                    yield line
+                    line = ""
 
-                elif interval:
-                    time.sleep(interval)
-
-            except Exception as e:
-                break
+            else:
+                time.sleep(interval)
 
         fp.close()
 
