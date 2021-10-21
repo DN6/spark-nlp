@@ -163,12 +163,11 @@ class CometLogger:
         line = ""
         while self._watch_file:
             partial_line = fp.readline()
-            if partial_line is not None:
+            if len(partial_line) != 0:
                 line += partial_line
                 if line.endswith("\n"):
                     yield line
                     line = ""
-
             else:
                 time.sleep(interval)
 
